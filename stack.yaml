@@ -39,9 +39,9 @@ packages:
 - .
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: [
-  ncurses-0.2.16
-]
+extra-deps:
+- git: https://github.com/WhoMeNope/haskell-ncurses
+  commit: 83f02b4512410cc5f6b4291ba2394c7291554b03
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

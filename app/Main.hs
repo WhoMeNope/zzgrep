@@ -12,11 +12,11 @@ import UI.NCurses
 
 readInput :: [String] -> IO [C.Contents]
 readInput [] = fmap (return . C.create "(standard input)") getContents
-readInput ["-"] = fmap (return . C.create "(standard input)") getContents
+readInput ["-"] = readInput []
 readInput fs
   | "-" `elem` fs =
     let withoutStdin = delete "-" fs
-     in (readInput withoutStdin) `mappend` fmap (return . C.create "(standard input)") getContents
+     in (readInput withoutStdin) `mappend` readInput []
   | otherwise =
     let reads = map (\f -> fmap (C.create f) $ readFile f) fs
      in sequence reads
@@ -38,10 +38,8 @@ outputLines flags contents = putStr $ unlines . fmap formatLine $ C.lines conten
 
 main = do
   (as, fs) <- F.parse =<< getArgs
-  -- putStrLn $ "Flags: " ++ show as
-  -- putStrLn $ "Files: " ++ show fs
   contents <- readInput fs
-  filtered <- runCurses $ do
+  filtered <- runNewCurses $ do
     setEcho False
     setCursorMode CursorInvisible
     w <- D.initWindow
