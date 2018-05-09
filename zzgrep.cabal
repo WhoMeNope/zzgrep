@@ -1,8 +1,8 @@
 name:           zzgrep
 version:        0.1.0.0
 description:    fuzzy grep
-homepage:       https://github.com/githubuser/simple#readme
-bug-reports:    https://github.com/githubuser/simple/issues
+homepage:       https://github.com/WhoMeNope/zzgrep
+bug-reports:    https://github.com/WhoMeNope/zzgrep/issues
 author:         Martin Toman
 maintainer:     whomenope@outlook.com
 copyright:      2018 WhoMeNope
