@@ -1,5 +1,5 @@
 module Flags
-  ( Flag(..)
+  ( Flag
   , parse
   ) where
 

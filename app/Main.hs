@@ -22,7 +22,8 @@ readInput fs
      in sequence reads
 
 outputLines :: [F.Flag] -> C.Contents -> IO ()
-outputLines flags contents = putStr $ unlines . fmap formatLine $ C.lines contents
+outputLines flags contents =
+  putStr $ unlines . fmap formatLine $ C.lines contents
   where
     formatLine (lno, parts) =
       let string = foldr (\line acc -> acc ++ line) [] parts
@@ -39,14 +40,15 @@ outputLines flags contents = putStr $ unlines . fmap formatLine $ C.lines conten
 main = do
   (as, fs) <- F.parse =<< getArgs
   contents <- readInput fs
-  filtered <- runNewCurses $ do
-    setEcho False
-    setCursorMode CursorInvisible
-    w <- D.initWindow
-    D.draw w as contents
-    f <- runLoop w as contents
-    closeWindow w
-    return f
+  filtered <-
+    runNewCurses $ do
+      setEcho False
+      setCursorMode CursorInvisible
+      w <- D.initWindow
+      D.draw w as contents
+      f <- runLoop w as contents
+      closeWindow w
+      return f
   mapM_ (outputLines as) filtered
 
 runLoop :: Window -> [F.Flag] -> [C.Contents] -> Curses ([C.Contents])
@@ -54,7 +56,8 @@ runLoop w fs contents = do
   ev <- getEvent w Nothing -- blocking
   handleEvent ev w fs contents
 
-handleEvent :: Maybe Event -> Window -> [F.Flag] -> [C.Contents] -> Curses ([C.Contents])
+handleEvent ::
+     Maybe Event -> Window -> [F.Flag] -> [C.Contents] -> Curses ([C.Contents])
 handleEvent Nothing w fs contents = runLoop w fs contents
 handleEvent (Just ev) w fs contents =
   case ev of

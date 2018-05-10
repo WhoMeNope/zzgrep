@@ -51,7 +51,7 @@ pop (fn, ft, ls)
   | ft == [] = (fn, ft, ls)
   | otherwise = (fn, init ft, fmap reconnectLast ls)
   where
-    reconnectLast (n, x:y:ls) = (n, (y ++ x):ls)
+    reconnectLast (n, x:y:ls) = (n, (y ++ x) : ls)
     reconnectLast (n, ls) = (n, ls)
 
 breakInclusive :: (Eq a) => (a -> Bool) -> [a] -> ([a], [a])

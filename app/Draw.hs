@@ -17,8 +17,9 @@ initWindow = do
   return w
 
 draw :: Window -> [F.Flag] -> [C.Contents] -> Curses ()
-draw w flags contents =
+draw w flags contents
   -- drawString throws if text overflows screen - catch and ignore
+ =
   (tryCurses $ do
      updateWindow w $ do
        clear
