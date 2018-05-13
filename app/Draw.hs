@@ -17,9 +17,8 @@ initWindow = do
   return w
 
 draw :: Window -> [F.Flag] -> [C.Contents] -> Curses ()
-draw w flags contents
+draw w flags contents =
   -- drawString throws if text overflows screen - catch and ignore
- =
   (tryCurses $ do
      updateWindow w $ do
        clear
@@ -34,7 +33,8 @@ drawLines :: C.Filename -> [F.Flag] -> [C.Line] -> Update ()
 drawLines filename flags lines = drawString $ unlines $ fmap formatLine lines
   where
     formatLine (lno, parts) =
-      let string = foldr (\line acc -> acc ++ line) [] parts
+      let string = foldr
+                    (\p acc -> acc ++ if p == "\n" then "" else p) [] parts
           prefix =
             if F.Filename `elem` flags
               then filename ++ ":"
