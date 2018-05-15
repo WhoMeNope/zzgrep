@@ -39,11 +39,11 @@ lines (fn, ft, ls) = Prelude.filter predicate ls
 
 push :: Contents -> Char -> Contents
 push (fn, ft, ls) c =
-  let filterLine (lno, (l:r)) =
+  let filterLine (lno, (l:older)) =
         let (found, rest) = breakInclusive (\c' -> c' == c) l
          in if c `elem` found && rest == ""
-              then (lno, "\n" : found : r)
-              else (lno, rest : found : r)
+              then (lno, "\n" : found : older)
+              else (lno, rest : found : older)
    in (fn, ft ++ [c], fmap filterLine ls)
 
 pop :: Contents -> Contents

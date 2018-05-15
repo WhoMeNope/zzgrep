@@ -18,7 +18,7 @@ readInput fs
     let withoutStdin = delete "-" fs
      in (readInput withoutStdin) `mappend` readInput []
   | otherwise =
-    let reads = map (\f -> fmap (C.create f) $ readFile f) fs
+    let reads = fmap (\f -> fmap (C.create f) $ readFile f) fs
      in sequence reads
 
 outputLines :: [F.Flag] -> C.Contents -> IO ()

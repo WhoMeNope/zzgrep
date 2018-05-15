@@ -23,6 +23,7 @@ draw w flags contents =
      updateWindow w $ do
        clear
        moveCursor 0 0
+       drawString "$ "
        drawString $ C.filter . head $ contents
        moveCursor 2 0
        mapM_ (\c -> drawLines (C.filename c) flags (C.lines c)) contents
@@ -30,17 +31,29 @@ draw w flags contents =
   return ()
 
 drawLines :: C.Filename -> [F.Flag] -> [C.Line] -> Update ()
-drawLines filename flags lines = drawString $ unlines $ fmap formatLine lines
+drawLines filename flags lines =
+  let prefix =
+        if F.Filename `elem` flags
+          then filename ++ ":"
+          else ""
+      number =
+        if F.Number `elem` flags
+          then \n -> (show n) ++ ":"
+          else \_ -> ""
+   in mapM_ (drawLine prefix number) lines
   where
-    formatLine (lno, parts) =
-      let string = foldr
-                    (\p acc -> acc ++ if p == "\n" then "" else p) [] parts
-          prefix =
-            if F.Filename `elem` flags
-              then filename ++ ":"
-              else ""
-          number =
-            if F.Number `elem` flags
-              then (show lno) ++ ":"
-              else ""
-       in prefix ++ number ++ string
+    drawLine prefix number (lno, parts) = do
+      drawString (prefix ++ (number lno))
+      let renderSeq =
+            foldr
+              (\p acc ->
+                let strn = init p
+                    bold = last p
+                 in if p == "\n"
+                      then acc
+                      else acc ++ [drawString strn, drawGlyph $ Glyph bold [AttributeBold]])
+              []
+              $ tail parts
+      sequence_ renderSeq
+      drawString $ head parts
+      drawString "\n"
