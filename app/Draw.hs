@@ -10,10 +10,18 @@ import UI.NCurses
 
 initWindow :: Curses (Window)
 initWindow = do
+  (rows, columns) <- screenSize
   dw <- defaultWindow
-  w <- newWindow 0 0 0 0
-  updateWindow dw $ overlay w OverlayReplace
-  render
+  --   newWindow rows columns beginY beginX
+  w <- newWindow rows columns 0 0
+  updateWindow dw $ overlay w OverlayMerge
+  maxColorID <- maxColorID
+  customColors <- canDefineColor
+  if customColors
+    then defineColor ColorDefault 10 10 10
+    else return ()
+  colorid <- newColorID ColorWhite ColorDefault (maxColorID - 1)
+  updateWindow w $ setBackground $ Glyph ' ' [AttributeColor colorid]
   return w
 
 draw :: Window -> [F.Flag] -> [C.Contents] -> Curses ()
@@ -21,10 +29,16 @@ draw w flags contents =
   -- drawString throws if text overflows screen - catch and ignore
   (tryCurses $ do
      updateWindow w $ do
+       (rows, columns) <- windowSize
        clear
+       -- Filter string
        moveCursor 0 0
        drawString "$ "
        drawString $ C.filter . head $ contents
+       -- Separator
+       moveCursor 1 0
+       drawLineH (Just glyphLineH) columns
+       -- Content
        moveCursor 2 0
        mapM_ (\c -> drawLines (C.filename c) flags (C.lines c)) contents
      render) >>
@@ -47,13 +61,14 @@ drawLines filename flags lines =
       let renderSeq =
             foldr
               (\p acc ->
-                let strn = init p
-                    bold = last p
-                 in if p == "\n"
-                      then acc
-                      else acc ++ [drawString strn, drawGlyph $ Glyph bold [AttributeBold]])
+                 if p == "\n"
+                   then acc
+                   else acc ++
+                        [ drawString $ init p
+                        , drawGlyph $ Glyph (last p) [AttributeBold]
+                        ])
               []
-              $ tail parts
+              (tail parts)
       sequence_ renderSeq
       drawString $ head parts
       drawString "\n"

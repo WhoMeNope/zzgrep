@@ -26,7 +26,15 @@ outputLines flags contents =
   putStr $ unlines . fmap formatLine $ C.lines contents
   where
     formatLine (lno, parts) =
-      let string = foldr (\line acc -> acc ++ line) [] parts
+      let string =
+            foldr
+              (\part acc ->
+                 acc ++
+                 if part == "\n"
+                   then ""
+                   else part)
+              []
+              parts
           prefix =
             if F.FilenameOut `elem` flags
               then C.filename contents ++ ":"
